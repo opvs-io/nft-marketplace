@@ -194,6 +194,19 @@ describe('Marketplace', function () {
         expect(await nftContract.balanceOf(buyer.address)).to.be.equal(expectedFinalNftBalanceOfBuyer);
       });
 
+      it('Should revert create market sale when buyer is seller', async function () {
+        const tokenId = await mintToken(owner);
+
+        await createMarketItem(price, tokenId, owner);
+        const marketItemId = await marketplaceContract.marketItemId();
+
+        const transaction = createMarketSale(price, marketItemId, owner);
+
+        const expectedRevertMessage = 'You cannot buy your market item';
+
+        await expect(transaction).to.be.revertedWith(expectedRevertMessage);
+      });
+
       it('Should revert if price is not equal', async function () {
         const seller = bob;
         const buyer = alice;
