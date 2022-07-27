@@ -2,11 +2,13 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 
 /// @title ERC721 token
 /// @author Bora Baloglu - OPVS (bora.baloglu@opvs.io)
-contract NFT is ERC721URIStorage {
+contract NFT is Ownable, ERC721URIStorage, ERC721Pausable {
     uint256 public tokenId;
 
     mapping(uint256 => address) private _tokenIdToCreatorAddress;
@@ -70,5 +72,33 @@ contract NFT is ERC721URIStorage {
         _setTokenURI(_tokenId, _tokenURI);
 
         return _tokenId;
+    }
+
+    function tokenURI(uint256 _tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
+        return ERC721URIStorage.tokenURI(_tokenId);
+    }
+
+    /// @dev Pauses all token transfers, only owner can call this function
+    function pause() public virtual onlyOwner {
+        _pause();
+    }
+
+    /// @dev Unpauses all token transfers, only owner can call this function
+    function unpause() public virtual onlyOwner {
+        _unpause();
+    }
+
+    /// @dev Override
+    function _burn(uint256 _tokenId) internal virtual override(ERC721, ERC721URIStorage) {
+        ERC721URIStorage._burn(_tokenId);
+    }
+
+    /// @dev Override
+    function _beforeTokenTransfer(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    ) internal virtual override(ERC721, ERC721Pausable) {
+        super._beforeTokenTransfer(_from, _to, _tokenId);
     }
 }

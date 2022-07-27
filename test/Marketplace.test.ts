@@ -101,6 +101,18 @@ describe('Marketplace', function () {
         expect(marketItemId).to.be.equal(expectedMarketItemId);
       });
 
+      it('Should revert create market item when nft contract is paused', async function () {
+        const tokenId = await mintToken(owner);
+
+        await nftContract.connect(owner).pause();
+
+        const transaction = createMarketItem(price, tokenId, owner);
+
+        const expectedRevertMessage = 'ERC721Pausable: token transfer while paused';
+
+        await expect(transaction).to.be.revertedWith(expectedRevertMessage);
+      });
+
       it('Should revert if create market item with not owned token', async function () {
         const tokenId = await mintToken(bob);
 
@@ -136,6 +148,21 @@ describe('Marketplace', function () {
         const tokenOwner = await nftContract.ownerOf(tokenId);
 
         expect(tokenOwner).to.be.equal(owner.address);
+      });
+
+      it('Should revert cancel market item when nft contract is paused', async function () {
+        const tokenId = await mintToken(owner);
+
+        await createMarketItem(price, tokenId, owner);
+        const marketItemId = await marketplaceContract.marketItemId();
+
+        await nftContract.connect(owner).pause();
+
+        const transaction = cancelMarketItem(marketItemId, owner);
+
+        const expectedRevertMessage = 'ERC721Pausable: token transfer while paused';
+
+        await expect(transaction).to.be.revertedWith(expectedRevertMessage);
       });
 
       it('Should revert cancel market item if not the seller', async function () {
@@ -192,6 +219,21 @@ describe('Marketplace', function () {
 
         // it should transfer NFT to buyer
         expect(await nftContract.balanceOf(buyer.address)).to.be.equal(expectedFinalNftBalanceOfBuyer);
+      });
+
+      it('Should revert create market sale when nft contract is paused', async function () {
+        const tokenId = await mintToken(owner);
+
+        await createMarketItem(price, tokenId, owner);
+        const marketItemId = await marketplaceContract.marketItemId();
+
+        await nftContract.connect(owner).pause();
+
+        const transaction = createMarketSale(price, marketItemId, bob);
+
+        const expectedRevertMessage = 'ERC721Pausable: token transfer while paused';
+
+        await expect(transaction).to.be.revertedWith(expectedRevertMessage);
       });
 
       it('Should revert create market sale when buyer is seller', async function () {
