@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
 
 contract Marketplace is ReentrancyGuard {
     uint256 public saleFeePercentage = 1;
@@ -30,6 +29,8 @@ contract Marketplace is ReentrancyGuard {
         _owner = msg.sender;
     }
 
+    /// @notice Get all of the market items that currently on sale
+    /// @return _onSaleMarketItems On sale market items
     function getOnSaleMarketItems() external view returns (MarketItem[] memory) {
         uint256 _numberOfMarketItems = marketItemId;
         uint256 _numberOfMarketItemsOnSale = _numberOfMarketItems -
@@ -49,6 +50,14 @@ contract Marketplace is ReentrancyGuard {
         return _onSaleMarketItems;
     }
 
+    /// @notice Create new market item from a minted token
+    /// @dev Only owner of the token can create market item.
+    /// Price of the market item must be greater than zero.
+    /// On success, the token will be transferred from the owner to the marketplace contract .
+    /// @param _nftContractAddress The address of the nft contract
+    /// @param _price The price of the market item
+    /// @param _tokenId The id of token that will be sold
+    /// @return _marketItemId The id of new market item
     function createMarketItem(
         address _nftContractAddress,
         uint256 _price,
@@ -75,6 +84,10 @@ contract Marketplace is ReentrancyGuard {
         return _marketItemId;
     }
 
+    /// @notice Cancel market item.
+    /// @dev Only seller of the market item can cancel.
+    /// On success, the token will be transferred from the marketplace contract to the seller.
+    /// @param _marketItemId The id of market item that will be cancelled
     function cancelMarketItem(uint256 _marketItemId) external payable nonReentrant {
         uint256 _tokenId = marketItemIdToMarketItem[_marketItemId].tokenId;
 
@@ -94,6 +107,12 @@ contract Marketplace is ReentrancyGuard {
         _numberOfMarketItemsCancelled++;
     }
 
+    /// @notice Create market sale
+    /// @dev msg.value must be equal to price of market item + sale fee
+    /// On success, the token will be transferred from the marketplace contract to the buyer.
+    /// On success, the price will be transferred from the buyer to the seller.
+    /// On success, the sale fee will be transferred from buyer to the marketplace owner.
+    /// @param _marketItemId The id of market item that will be sold
     function createMarketSale(uint256 _marketItemId) external payable nonReentrant {
         uint256 _price = marketItemIdToMarketItem[_marketItemId].price;
         uint256 _saleFee = (_price * saleFeePercentage) / 100;

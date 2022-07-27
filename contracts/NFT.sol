@@ -4,6 +4,8 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
+/// @title ERC721 token
+/// @author Bora Baloglu - OPVS (bora.baloglu@opvs.io)
 contract NFT is ERC721URIStorage {
     uint256 public tokenId;
 
@@ -11,6 +13,8 @@ contract NFT is ERC721URIStorage {
 
     constructor() ERC721("OPVS", "OPVS") {}
 
+    /// @notice Get all of owned tokens by msg.sender
+    /// @return _ownedTokens An array of token ids that are owned by msg.sender
     function getOwnedTokens() public view returns (uint256[] memory) {
         uint256 _numberOfTokens = tokenId;
         uint256 _numberOfOwnedTokens = balanceOf(msg.sender);
@@ -28,6 +32,8 @@ contract NFT is ERC721URIStorage {
         return _ownedTokens;
     }
 
+    /// @notice Get all of the created tokens by msg.sender
+    /// @return _createdTokens An array of token ids that are created by msg.sender
     function getCreatedTokens() public view returns (uint256[] memory) {
         uint256 _numberOfTokens = tokenId;
 
@@ -51,6 +57,9 @@ contract NFT is ERC721URIStorage {
         return _createdTokens;
     }
 
+    /// @notice Mint new token
+    /// @param _tokenURI The URI of token that holds metadata of the token
+    /// @return _tokenId The id of new token
     function mint(string memory _tokenURI) external returns (uint256) {
         tokenId++;
         uint256 _tokenId = tokenId;
