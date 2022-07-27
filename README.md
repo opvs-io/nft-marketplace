@@ -7,7 +7,10 @@ An example of basic NFT marketplace implementation with Solidity, Hardhat and Ne
 - NFT
   - Getting owned tokens
   - Getting created tokens
+  - Getting tokenURI of tokens
   - Minting ERC721 token
+  - Pause transactions
+  - Unpause transactions
 - Marketplace
   - Getting on sale market items
   - Creating market item

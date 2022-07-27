@@ -65,6 +65,16 @@ describe('NFT', function () {
 
       expect(createdTokens).to.be.deep.equal(expectedCreatedTokens);
     });
+
+    it('Should return tokenURI', async function () {
+      const expectedTokenURI = 'test-token-uri';
+
+      const tokenId = (await mintToken(owner, expectedTokenURI, true)) as BigNumber;
+
+      const tokenURI = await nftContract.tokenURI(tokenId);
+
+      expect(tokenURI).to.be.equal(expectedTokenURI);
+    });
   });
 
   describe('Minting', function () {
