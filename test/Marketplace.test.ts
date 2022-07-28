@@ -249,6 +249,21 @@ describe('Marketplace', function () {
         await expect(transaction).to.be.revertedWith(expectedRevertMessage);
       });
 
+      it('Should revert if market item is not on sale', async function () {
+        const tokenId = await mintToken(owner);
+
+        await createMarketItem(price, tokenId, owner);
+        const marketItemId = await marketplaceContract.marketItemId();
+
+        await cancelMarketItem(marketItemId, owner);
+
+        const transaction = createMarketSale(price, marketItemId, bob);
+
+        const expectedRevertMessage = 'Market item is not on sale';
+
+        await expect(transaction).to.be.revertedWith(expectedRevertMessage);
+      });
+
       it('Should revert if price is not equal', async function () {
         const seller = bob;
         const buyer = alice;

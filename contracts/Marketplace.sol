@@ -114,6 +114,7 @@ contract Marketplace is ReentrancyGuard {
     /// On success, the sale fee will be transferred from buyer to the marketplace owner.
     /// @param _marketItemId The id of market item that will be sold
     function createMarketSale(uint256 _marketItemId) external payable nonReentrant {
+        require(marketItemIdToMarketItem[_marketItemId].onSale, "Market item is not on sale");
         require(marketItemIdToMarketItem[_marketItemId].seller != msg.sender, "You cannot buy your market item");
 
         uint256 _price = marketItemIdToMarketItem[_marketItemId].price;
